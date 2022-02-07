@@ -65,6 +65,9 @@ class TaskHistoryViewSet(
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TaskHistoryFilter
 
+    def get_queryset(self):
+        return TaskHistory.objects.filter(task__user=self.request.user)
+
 
 class TaskViewSet(ModelViewSet):
     queryset = Task.objects.all()
