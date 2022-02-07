@@ -33,6 +33,7 @@ from django_filters.rest_framework import (
     ChoiceFilter,
     BooleanFilter,
     DateFromToRangeFilter,
+    ModelChoiceFilter,
 )
 from django_filters.widgets import RangeWidget
 
@@ -47,6 +48,7 @@ class TaskHistoryFilter(FilterSet):
     change_date = DateFromToRangeFilter(widget=RangeWidget(attrs={"type": "date"}))
     previous_status = ChoiceFilter(choices=STATUS_CHOICES)
     current_status = ChoiceFilter(choices=STATUS_CHOICES)
+    task = ModelChoiceFilter(queryset=Task.objects.all())
 
 
 class TaskHistoryViewSet(
