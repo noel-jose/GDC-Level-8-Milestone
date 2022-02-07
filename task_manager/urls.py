@@ -16,7 +16,7 @@ from tasks.views import (
     session_storage_view,
 )
 
-from tasks.apiviews import TaskListAPI
+from tasks.apiviews import TaskHistoryViewSet, TaskListAPI
 
 from rest_framework.routers import SimpleRouter
 
@@ -24,6 +24,7 @@ from tasks.apiviews import TaskViewSet
 
 router = SimpleRouter()
 router.register(prefix="api/tasks", viewset=TaskViewSet)
+router.register(prefix="history/task", viewset=TaskHistoryViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),

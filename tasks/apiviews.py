@@ -1,10 +1,12 @@
+from random import choices
+from click import Choice
 from django.http import HttpResponse
 from django.views import View
 
 from django.http.response import JsonResponse
 from django.shortcuts import render
 
-from tasks.models import STATUS_CHOICES, Task
+from tasks.models import STATUS_CHOICES, Task, TaskHistory
 
 from rest_framework.views import APIView
 
@@ -12,11 +14,17 @@ from rest_framework.response import Response
 
 from rest_framework.serializers import ModelSerializer
 
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from rest_framework.permissions import IsAuthenticated
 
 from django.contrib.auth.models import User
+
+from rest_framework import mixins
+
+from .models import TaskHistory
+
+from .serializers import TaskSerializer, TaskHistorySerializer
 
 from django_filters.rest_framework import (
     DjangoFilterBackend,
@@ -24,7 +32,9 @@ from django_filters.rest_framework import (
     CharFilter,
     ChoiceFilter,
     BooleanFilter,
+    DateFromToRangeFilter,
 )
+from django_filters.widgets import RangeWidget
 
 
 class TaskFilter(FilterSet):
@@ -33,18 +43,25 @@ class TaskFilter(FilterSet):
     completed = BooleanFilter()
 
 
-class UserSerializer(ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["first_name", "last_name", "username"]
+class TaskHistoryFilter(FilterSet):
+    change_date = DateFromToRangeFilter(widget=RangeWidget(attrs={"type": "date"}))
+    previous_status = ChoiceFilter(choices=STATUS_CHOICES)
+    current_status = ChoiceFilter(choices=STATUS_CHOICES)
 
 
-class TaskSerializer(ModelSerializer):
-    user = UserSerializer(read_only=True)
+class TaskHistoryViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    GenericViewSet,
+):
+    queryset = TaskHistory.objects.all()
+    serializer_class = TaskHistorySerializer
 
-    class Meta:
-        model = Task
-        fields = ["title", "description", "priority", "completed", "user", "status"]
+    permission_classes = (IsAuthenticated,)
+
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TaskHistoryFilter
 
 
 class TaskViewSet(ModelViewSet):
