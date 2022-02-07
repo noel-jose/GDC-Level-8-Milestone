@@ -24,7 +24,7 @@ from tasks.apiviews import TaskViewSet
 
 router = SimpleRouter()
 router.register(prefix="api/tasks", viewset=TaskViewSet)
-router.register(prefix="history/task", viewset=TaskHistoryViewSet)
+router.register(prefix="api/history/task", viewset=TaskHistoryViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
