@@ -1,5 +1,4 @@
 from random import choices
-from click import Choice
 from django.http import HttpResponse
 from django.views import View
 

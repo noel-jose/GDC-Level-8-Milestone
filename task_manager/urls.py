@@ -1,3 +1,4 @@
+from cgi import test
 from django.contrib import admin
 from django.contrib.auth.views import LogoutView
 from django.urls import path
@@ -22,6 +23,14 @@ from rest_framework.routers import SimpleRouter
 
 from tasks.apiviews import TaskViewSet
 
+from tasks.tasks import test_background_jobs
+
+from django.http import HttpResponse
+
+def test_bg(request):
+    test_background_jobs.delay()
+    return HttpResponse("All Good Here")
+
 router = SimpleRouter()
 router.register(prefix="api/tasks", viewset=TaskViewSet)
 router.register(prefix="api/history/task", viewset=TaskHistoryViewSet)
@@ -42,4 +51,5 @@ urlpatterns = [
     path("user/signup", UserCreateView.as_view()),
     path("user/login", UserLoginView.as_view()),
     path("user/logout", LogoutView.as_view()),
+    path("test_bg",test_bg)
 ] + router.urls
