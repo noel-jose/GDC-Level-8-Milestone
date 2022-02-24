@@ -35,3 +35,11 @@ class TaskHistory(models.Model):
     )
     change_date = models.DateTimeField(auto_now=True)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
+
+
+class Profile(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True)
+    alert_time = models.TimeField(null = True,blank=True)
+
+    # def __str__(self):
+    #     return self.user.username

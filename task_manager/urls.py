@@ -15,6 +15,7 @@ from tasks.views import (
     UserCreateView,
     UserLoginView,
     session_storage_view,
+    ReminderTimeSetView
 )
 
 from tasks.apiviews import TaskHistoryViewSet, TaskListAPI
@@ -50,6 +51,8 @@ urlpatterns = [
     path("sessiontest", session_storage_view),
     path("user/signup", UserCreateView.as_view()),
     path("user/login", UserLoginView.as_view()),
+    path("reminder",ReminderTimeSetView.as_view()),
     path("user/logout", LogoutView.as_view()),
-    path("test_bg",test_bg)
+    path("test_bg",test_bg),
+    
 ] + router.urls

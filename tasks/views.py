@@ -4,17 +4,18 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm
+from django.forms import ModelForm,TimeInput
 from django.http import HttpResponse, HttpResponseRedirect, request
 from django.shortcuts import render
 from django.views import View
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.edit import FormView
 
 from django.db import transaction
 
-from tasks.models import Task
+from tasks.models import Task,Profile
 
 
 class AuthorisedTaskManager(LoginRequiredMixin):
@@ -22,6 +23,47 @@ class AuthorisedTaskManager(LoginRequiredMixin):
         return Task.objects.filter(deleted=False, user=self.request.user)
 
 
+
+# a form for accepting the user alert time
+class TimeInputForm(ModelForm):
+    class Meta:
+        model = Profile
+        fields = ["alert_time"]
+        widgets = {
+            'alert_time': TimeInput(attrs={'type': 'time'}),
+        }
+    
+
+# a view to set the alert timef
+class ReminderTimeSetView(LoginRequiredMixin,FormView):
+    model = Profile
+    form_class = TimeInputForm
+    template_name = "dateform.html"
+    success_url = "/tasks"
+
+    def form_valid(self,form):
+        print("Form is valid")
+        profiles = Profile.objects.all()
+        time = form.cleaned_data.get("alert_time")
+        print(time)
+        profile = profiles.get(user = self.request.user)
+        profile.alert_time = time
+        profile.save()
+        print(profile)
+        # profile.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    # def get_queryset(self):
+    #     return Profile.objects.filter(user = self.request.user)
+
+
+    
+
+    # def form_valid(self, form):
+    #     print("The form is valid")
+    #     print(form.data["alert_time"])
+    #     return HttpResponse("Succesfully got the value")
+    
 class PrioirtyValidation(AuthorisedTaskManager):
     def validate_priority(self, object):
         # getting priority of the task to be created
@@ -94,6 +136,7 @@ class UserCreateView(CreateView):
     form_class = CustomUserCreationForm
     template_name = "user_create.html"
     success_url = "/user/login"
+
 
 
 def session_storage_view(request):
