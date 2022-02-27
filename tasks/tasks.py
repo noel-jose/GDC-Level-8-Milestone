@@ -20,9 +20,9 @@ import pytz
 @periodic_task(run_every=timedelta(seconds=60))
 def send_mail_reminder():
         print("==================================================!")
-        current_time = datetime.now(pytz.timezone("UTC")).time().strftime("%H:%M:00")
+        current_time = datetime.now(pytz.timezone("UTC"))
         print("Current time "+str(current_time))
-        for profile in Profile.objects.filter(utc_time = current_time):
+        for profile in Profile.objects.filter(next_update__lt = current_time):
             user = profile.user
             
             pending_qs = Task.objects.filter(user = user,deleted = False,status = STATUS_CHOICES[0][0])
@@ -36,7 +36,10 @@ def send_mail_reminder():
             {cancelled_qs.count()} Cancelled Tasks
         """
             send_mail("Pending tasks from task manager",email_content,"task@task_manager.org",{user.email})
+            profile.next_update = profile.next_update + timedelta(days=1)
+            profile.save(update_fields=['next_update'])
             print(f"Completed Processing user {user.id}")
+
 
 
 # adding "send_mail_reminder" to the beat scheduler
