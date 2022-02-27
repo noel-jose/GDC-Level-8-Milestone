@@ -136,4 +136,3 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# DATETIME_FORMAT =  '%M:%S'

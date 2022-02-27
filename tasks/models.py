@@ -2,6 +2,12 @@ from django.db import models
 
 from django.contrib.auth.models import User
 
+from django.utils import timezone
+
+from datetime import datetime
+
+import pytz
+
 STATUS_CHOICES = (
     ("PENDING", "PENDING"),
     ("IN_PROGRESS", "INPROGRESS"),
@@ -9,6 +15,7 @@ STATUS_CHOICES = (
     ("CANCELLED", "CANCELLED"),
 )
 
+TIMEZONES = tuple(zip(pytz.all_timezones,pytz.all_timezones))
 
 class Task(models.Model):
     title = models.CharField(max_length=100)
@@ -39,7 +46,9 @@ class TaskHistory(models.Model):
 
 class Profile(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True)
-    alert_time = models.TimeField(null = True,blank=True)
+    alert_time = models.DateTimeField(null = True,blank=True,default=timezone.now())
+    utc_time = models.TimeField(null=True)
+    timezone = models.CharField(max_length=32,choices = TIMEZONES,default='UTC')
 
     # def __str__(self):
     #     return self.user.username

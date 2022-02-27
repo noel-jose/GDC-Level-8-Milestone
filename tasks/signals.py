@@ -2,7 +2,6 @@ from .models import Task, TaskHistory,Profile
 from django.db.models.signals import pre_save,post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
-from tasks.tasks import setReminder
 
 
 @receiver(pre_save, sender=Task)
@@ -45,16 +44,16 @@ def create_profile(sender,instance,created,**kwargs):
     else:
         pass
 
-# sending a request to add the celery task to the worker after being saved
-@receiver(post_save,sender=Profile)
-def create_task(sender,instance,created,**kwargs):
+# # sending a request to add the celery task to the worker after being saved
+# @receiver(post_save,sender=Profile)
+# def create_task(sender,instance,created,**kwargs):
     
-    print(f"Updated the date of the profile { instance }")
-    time = str(instance.alert_time)
-    hours = time[0:2]
-    minutes = time[3:5]
-    setReminder(minutes,hours,instance)
-    print("Successfully completed the create_task_reminder")
+#     print(f"Updated the date of the profile { instance }")
+#     time = str(instance.alert_time)
+#     hours = time[0:2]
+#     minutes = time[3:5]
+#     setReminder(minutes,hours,instance)
+#     print("Successfully completed the create_task_reminder")
 
 
 

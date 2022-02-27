@@ -18,51 +18,14 @@ from django.db import transaction
 from tasks.models import Task,Profile
 
 
+
+
 class AuthorisedTaskManager(LoginRequiredMixin):
     def get_queryset(self):
         return Task.objects.filter(deleted=False, user=self.request.user)
 
 
 
-# a form for accepting the user alert time
-class TimeInputForm(ModelForm):
-    class Meta:
-        model = Profile
-        fields = ["alert_time"]
-        widgets = {
-            'alert_time': TimeInput(attrs={'type': 'time'}),
-        }
-    
-
-# a view to set the alert timef
-class ReminderTimeSetView(LoginRequiredMixin,FormView):
-    model = Profile
-    form_class = TimeInputForm
-    template_name = "dateform.html"
-    success_url = "/tasks"
-
-    def form_valid(self,form):
-        print("Form is valid")
-        profiles = Profile.objects.all()
-        time = form.cleaned_data.get("alert_time")
-        print(time)
-        profile = profiles.get(user = self.request.user)
-        profile.alert_time = time
-        profile.save()
-        print(profile)
-        # profile.save()
-        return HttpResponseRedirect(self.get_success_url())
-
-    # def get_queryset(self):
-    #     return Profile.objects.filter(user = self.request.user)
-
-
-    
-
-    # def form_valid(self, form):
-    #     print("The form is valid")
-    #     print(form.data["alert_time"])
-    #     return HttpResponse("Succesfully got the value")
     
 class PrioirtyValidation(AuthorisedTaskManager):
     def validate_priority(self, object):
@@ -307,3 +270,36 @@ class GenericAllTaskView(LoginRequiredMixin, ListView):
             "total_count": total_count,
         }
         return alltasks
+
+
+# a form for accepting the user alert time
+class TimeInputForm(ModelForm):
+    class Meta:
+        model = Profile
+        fields = ["alert_time","timezone"]
+        widgets = {
+            'alert_time': TimeInput(attrs={'type': 'datetime-local'}),
+        }
+    
+from django.utils.dateparse import parse_date
+import pytz
+
+# a view to set the alert timef
+class ReminderTimeSetView(LoginRequiredMixin,FormView):
+    model = Profile
+    form_class = TimeInputForm
+    template_name = "dateform.html"
+    success_url = "/tasks"
+
+    def form_valid(self,form):
+        print("Form is valid")
+        profiles = Profile.objects.all()
+        datetime = form.cleaned_data.get("alert_time")
+        timezone = form.cleaned_data.get("timezone")
+        datetime = datetime.replace(tzinfo = pytz.timezone(timezone))
+        utc_time = datetime.astimezone(pytz.utc).time()
+        profile = profiles.get(user = self.request.user)
+        profile.alert_time = datetime
+        profile.utc_time = utc_time.strftime("%H:%M:00")
+        profile.save()
+        return HttpResponseRedirect(self.get_success_url())
