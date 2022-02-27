@@ -297,9 +297,7 @@ class ReminderTimeSetView(LoginRequiredMixin,FormView):
         datetime = form.cleaned_data.get("alert_time")
         timezone = form.cleaned_data.get("timezone")
         datetime = datetime.replace(tzinfo = pytz.timezone(timezone))
-        print("Local time "+ str(datetime))
         utc_time = datetime.astimezone(pytz.utc).time()
-        print("New time with timezone"+" "+str(utc_time))
         profile = profiles.get(user = self.request.user)
         profile.alert_time = datetime
         profile.utc_time = utc_time.strftime("%H:%M:00")
