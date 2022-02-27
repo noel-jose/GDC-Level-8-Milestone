@@ -15,7 +15,7 @@ from tasks.views import (
     UserCreateView,
     UserLoginView,
     session_storage_view,
-    ReminderTimeSetView
+    ReminderTimeSetView,
 )
 
 from tasks.apiviews import TaskHistoryViewSet, TaskListAPI
