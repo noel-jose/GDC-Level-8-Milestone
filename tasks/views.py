@@ -301,5 +301,6 @@ class ReminderTimeSetView(LoginRequiredMixin,FormView):
         profile = profiles.get(user = self.request.user)
         profile.alert_time = datetime
         profile.utc_time = utc_time.strftime("%H:%M:00")
+        profile.last_updated = profile.alert_time
         profile.save()
         return HttpResponseRedirect(self.get_success_url())

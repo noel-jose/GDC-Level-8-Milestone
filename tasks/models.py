@@ -49,6 +49,7 @@ class Profile(models.Model):
     alert_time = models.DateTimeField(null = True,blank=True,default=timezone.now())
     utc_time = models.TimeField(null=True)
     timezone = models.CharField(max_length=32,choices = TIMEZONES,default='UTC')
+    next_update = models.DateTimeField(null = True)
 
     # def __str__(self):
     #     return self.user.username
